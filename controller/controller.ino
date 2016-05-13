@@ -35,6 +35,8 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
+#include "soak.h"
+
 AudioPlaySdWav           playWav1;
 AudioOutputI2S           audioOutput;
 AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
@@ -64,6 +66,14 @@ void setup() {
       delay(500);
     }
   }
+
+  delay(100);
+  Serial.println();
+  delay(100);
+  for (int i=0; i < 100; i++) {
+	light_off(i);
+	delay(10);
+  }
 }
 
 void playFile(const char *filename)
@@ -88,15 +98,30 @@ void playFile(const char *filename)
   }
 }
 
+int n=199;
+elapsedMillis ms;
+int bstate;
 
 void loop() {
-  playFile("SDTEST1.WAV");  // filenames are always uppercase 8.3 format
-  delay(500);
-  playFile("SDTEST2.WAV");
-  delay(500);
-  playFile("SDTEST3.WAV");
-  delay(500);
-  playFile("SDTEST4.WAV");
-  delay(1500);
+	buttons_update();
+
+	if (ms > 300) {
+		if (bstate) {
+			light_on(n);
+			bstate = 0;
+		} else {
+			light_off(n);
+			bstate = 1;
+		}
+		ms -= 300;
+	}
+  //playFile("SDTEST1.WAV");  // filenames are always uppercase 8.3 format
+  //delay(500);
+  //playFile("SDTEST2.WAV");
+  //delay(500);
+  //playFile("SDTEST3.WAV");
+  //delay(500);
+  //playFile("SDTEST4.WAV");
+  //delay(1500);
 }
 
