@@ -14,10 +14,10 @@ void setup()
 
 void transmit(char cmd, unsigned int num)
 {
-	//Serial.print(cmd);
-	//Serial.println(num);
-	Serial1.print(cmd);
+	//Serial.print(num);
+	//Serial.println(cmd);
 	Serial1.print(num);
+	Serial1.print(cmd);
 }
 
 unsigned int incoming=0;
