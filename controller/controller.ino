@@ -25,10 +25,6 @@
 // 22 = Audio shield: TX
 // 23 = Audio shield: RX
 
-#define SDCARD_CS_PIN    4
-#define SDCARD_MOSI_PIN  7
-#define SDCARD_SCK_PIN   14
-
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -37,64 +33,44 @@
 
 #include "soak.h"
 
-AudioPlaySdWav           playWav1;
+AudioPlaySdWav           playEffect;
+AudioPlaySdWav           playVoice;
+AudioPlaySdWav           playBackground;
+AudioMixer4              mixer1;
 AudioOutputI2S           audioOutput;
-AudioConnection          patchCord1(playWav1, 0, audioOutput, 0);
-AudioConnection          patchCord2(playWav1, 1, audioOutput, 1);
+AudioConnection          patchCord1(playEffect, 0, mixer1, 0);
+AudioConnection          patchCord2(playVoice, 0, mixer1, 1);
+AudioConnection          patchCord3(playBackground, 0, mixer1, 2);
+AudioConnection          patchCord4(mixer1, 0, audioOutput, 0);
+AudioConnection          patchCord5(mixer1, 0, audioOutput, 1);
 AudioControlSGTL5000     sgtl5000_1;
 
 void setup() {
+  // turn on serial ports, for controlling everything
   Serial1.begin(117647);
-  Serial2.setRX(26); // don't take pin 9 away from audio shield
+  Serial2.setRX(26);   // don't take pin 9 away from audio shield
   Serial2.begin(250000);
-  Serial3.begin(9600);
+  Serial3.begin(9600); // pin 7 will be claimed by SPI with SD.begin()
 
-  AudioMemory(8);
-
-  // Comment these out if not using the audio adaptor board.
-  // This may wait forever if the SDA & SCL pins lack
-  // pullup resistors
+  // turn on the audio shield
+  AudioMemory(20);
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.3);
 
-  SPI.setMOSI(SDCARD_MOSI_PIN);
-  SPI.setSCK(SDCARD_SCK_PIN);
-  if (!(SD.begin(SDCARD_CS_PIN))) {
+  // start up the SD card
+  SPI.setMOSI(7);
+  SPI.setSCK(14);
+  if (!(SD.begin(4))) {
     // stop here, but print a message repetitively
     while (1) {
       Serial.println("Unable to access the SD card");
       delay(500);
     }
   }
-
-  delay(100);
-  Serial.println();
-  delay(100);
-  for (int i=0; i < 100; i++) {
+  // TODO: why does this not turn off all the lights?
+  for (int i=0; i < 200; i++) {
 	light_off(i);
-	delay(10);
-  }
-}
-
-void playFile(const char *filename)
-{
-  Serial.print("Playing file: ");
-  Serial.println(filename);
-
-  // Start playing the file.  This sketch continues to
-  // run while the file plays.
-  playWav1.play(filename);
-
-  // A brief delay for the library read WAV info
-  delay(5);
-
-  // Simply wait for the file to finish playing.
-  while (playWav1.isPlaying()) {
-    // uncomment these lines if you audio shield
-    // has the optional volume pot soldered
-    //float vol = analogRead(15);
-    //vol = vol / 1024;
-    // sgtl5000_1.volume(vol);
+	delay(1);
   }
 }
 
@@ -104,6 +80,65 @@ int bstate;
 
 void loop() {
 	buttons_update();
+
+	if (button_press(4)) {
+		Serial.println("Button 4");
+		playEffect.play("BEEP01.WAV");
+	}
+	if (button_press(5)) {
+		Serial.println("Button 5");
+		playEffect.play("BEEP02.WAV");
+	}
+	if (button_press(6)) {
+		playEffect.play("BEEP03.WAV");
+	}
+	if (button_press(7)) {
+		playEffect.play("BEEP04.WAV");
+	}
+	if (button_press(8)) {
+		playEffect.play("BEEP05.WAV");
+	}
+	if (button_press(9)) {
+		playEffect.play("BEEP07.WAV");
+	}
+	if (button_press(10)) {
+		playEffect.play("BEEP08.WAV");
+	}
+	if (button_press(11)) {
+		playEffect.play("BEEP09.WAV");
+	}
+	if (button_press(12)) {
+		playEffect.play("BEEP10.WAV");
+	}
+	if (button_press(13)) {
+		playEffect.play("BEEP11.WAV");
+	}
+	if (button_press(14)) {
+		playEffect.play("BEEP12.WAV");
+	}
+	if (button_press(15)) {
+		playEffect.play("BEEP13.WAV");
+	}
+	if (button_press(16)) {
+		playEffect.play("BEEP14.WAV");
+	}
+	if (button_press(17)) {
+		playEffect.play("BEEP16.WAV");
+	}
+	if (button_press(18)) {
+		playEffect.play("BEEP17.WAV");
+	}
+	if (button_press(19)) {
+		playEffect.play("BEEP18.WAV");
+	}
+	if (button_press(20)) {
+		playEffect.play("BEEP19.WAV");
+	}
+	if (button_press(21)) {
+		playEffect.play("BEEP21.WAV");
+	}
+
+
 
 	if (ms > 300) {
 		if (bstate) {
@@ -115,13 +150,5 @@ void loop() {
 		}
 		ms -= 300;
 	}
-  //playFile("SDTEST1.WAV");  // filenames are always uppercase 8.3 format
-  //delay(500);
-  //playFile("SDTEST2.WAV");
-  //delay(500);
-  //playFile("SDTEST3.WAV");
-  //delay(500);
-  //playFile("SDTEST4.WAV");
-  //delay(1500);
 }
 
