@@ -31,9 +31,11 @@ const uint8_t outputpins[32] = {
 
 void input(char c)
 {
+	timeout = 0;
 	if (c >= '0' && c <= '9') {
 		incoming *= 10;
 		incoming += c - '0';
+		return;
 	} else if (c == 'S') {
 		if (incoming < 32) {
 			digitalWrite(outputpins[incoming], HIGH);
@@ -48,9 +50,8 @@ void input(char c)
 		}
 	} else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
 		transmit(c, incoming);
-		incoming = 0;
 	}
-	timeout = 0;
+	incoming = 0;
 }
 
 void loop()
@@ -58,9 +59,9 @@ void loop()
 	if (Serial1.available()) {
 		input(Serial1.read());
 	}
-	if (Serial.available()) {
-		input(Serial.read());
-	}
+	//if (Serial.available()) {
+		//input(Serial.read());
+	//}
 	if (timeout > 250) {
 		incoming = 0;
 		timeout = 0;
