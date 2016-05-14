@@ -79,6 +79,7 @@ elapsedMillis ms;
 int bstate;
 
 void loop() {
+	lights_update();
 	buttons_update();
 
 	if (button_press(4)) {
@@ -90,6 +91,7 @@ void loop() {
 		playEffect.play("BEEP02.WAV");
 	}
 	if (button_press(6)) {
+		light_toggle(6);
 		playEffect.play("BEEP03.WAV");
 	}
 	if (button_press(7)) {
@@ -143,8 +145,10 @@ void loop() {
 	if (ms > 300) {
 		if (bstate) {
 			light_on(n);
+			light_toggle(5);
 			bstate = 0;
 		} else {
+			light_toggle(4);
 			light_off(n);
 			bstate = 1;
 		}

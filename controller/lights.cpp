@@ -1,7 +1,11 @@
 #include <Arduino.h>
 #include "soak.h"
 
-static const int lightcodes[] = {
+static unsigned char state[96];  // 0=off, 1=on, 2=blink off, 3=blink on
+static unsigned int blink_msec[96];
+static unsigned int blink_prev[96];
+
+static const int lightcodes[200] = {
 //   1   2   3   4   5   6   7   8   9
 -1, -1, -1, -1, 27, 24, 25, 26, -1,  4,  //   0-9
  0,  3,  2,  1,  5, 28, 29, 31, 30,  6,  //  10-19
@@ -26,21 +30,108 @@ static const int lightcodes[] = {
 // dead: 15 21 22 23 36 38 62 80 86
 };
 
+// turn a light on
 void light_on(unsigned int num)
 {
 	if (num > 199) return;
 	int lcode = lightcodes[num];
 	if (lcode < 0) return;
+	state[lcode] = 1;
 	Serial1.print(lcode);
 	Serial1.print('S');
 }
 
+// turn a light off
 void light_off(unsigned int num)
 {
 	if (num > 199) return;
 	int lcode = lightcodes[num];
 	if (lcode < 0) return;
+	state[lcode] = 0;
 	Serial1.print(lcode);
 	Serial1.print('s');
 }
+
+// toggle a light on/off (on if it was off, or off it is was on)
+void light_toggle(unsigned int num)
+{
+	if (num > 199) return;
+	int lcode = lightcodes[num];
+	if (lcode < 0) return;
+	if (state[lcode] == 0) {
+		Serial.println("toggle on");
+		state[lcode] = 1;
+		Serial1.print(lcode);
+		Serial1.print('S');
+	} else {
+		Serial.println("toggle off");
+		state[lcode] = 0;
+		Serial1.print(lcode);
+		Serial1.print('s');
+	}
+}
+
+// cause a light to blink
+void light_blink(unsigned int num, unsigned int milliseconds)
+{
+	if (num > 199) return;
+	int lcode = lightcodes[num];
+	if (lcode < 0) return;
+	if (milliseconds < 50) {
+		milliseconds = 50; // fastest = 10 blinks/sec
+	} else if (milliseconds > 10000) {
+		milliseconds = 10000; // slowest = once every 20 seconds
+	}
+	Serial1.print(lcode);
+	Serial1.print('S');
+	blink_msec[lcode] = milliseconds;
+	blink_prev[lcode] = millis();
+	state[lcode] = 3;
+}
+
+// returns true if the light is on or blinking (even if momentarily off)
+int light_is_on(unsigned int num)
+{
+	if (num > 199) return 0;
+	int lcode = lightcodes[num];
+	if (lcode < 0) return 0;
+	if (state[lcode] == 0) return 0;
+	return 1;
+}
+
+// returns true if the light is blinking, but not if it's on solid
+int light_is_blinking(unsigned int num)
+{
+	if (num > 199) return 0;
+	int lcode = lightcodes[num];
+	if (lcode < 0) return 0;
+	if (state[lcode] == 0 || state[lcode] == 1) return 0;
+	return 1;
+}
+
+// needs to be called every loop(), to update the blinking lights
+void lights_update()
+{
+	unsigned int tnow = millis();
+
+	for (int i=0; i < 96; i++) {
+		if (state[i] == 2) {
+			if (tnow - blink_prev[i] > blink_msec[i]) {
+				Serial1.print(i);
+				Serial1.print('S');
+				state[i] = 3;
+				blink_prev[i] = tnow;
+			}
+		} else if (state[i] == 3) {
+			if (tnow - blink_prev[i] > blink_msec[i]) {
+				Serial1.print(i);
+				Serial1.print('s');
+				state[i] = 2;
+				blink_prev[i] = tnow;
+			}
+		}
+	}
+}
+
+
 

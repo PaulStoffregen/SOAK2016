@@ -48,9 +48,9 @@ void buttons_update()
 				press[incoming >> 5] |= (1 << (incoming & 31));
 				state[incoming >> 5] |= (1 << (incoming & 31));
 			}
-			Serial.print("Button ");
-			Serial.print(incoming);
-			Serial.println();
+			//Serial.print("Button ");
+			//Serial.print(incoming);
+			//Serial.println();
 		} else if (c == 'b') {
 			// button release
 			if (incoming < 256) {
