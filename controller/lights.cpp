@@ -53,21 +53,23 @@ void light_off(unsigned int num)
 }
 
 // toggle a light on/off (on if it was off, or off it is was on)
-void light_toggle(unsigned int num)
+int light_toggle(unsigned int num)
 {
-	if (num > 199) return;
+	if (num > 199) return 0;
 	int lcode = lightcodes[num];
-	if (lcode < 0) return;
+	if (lcode < 0) return 0;
 	if (state[lcode] == 0) {
 		Serial.println("toggle on");
 		state[lcode] = 1;
 		Serial1.print(lcode);
 		Serial1.print('S');
+		return 1;
 	} else {
 		Serial.println("toggle off");
 		state[lcode] = 0;
 		Serial1.print(lcode);
 		Serial1.print('s');
+		return 0;
 	}
 }
 
@@ -87,6 +89,34 @@ void light_blink(unsigned int num, unsigned int milliseconds)
 	blink_msec[lcode] = milliseconds;
 	blink_prev[lcode] = millis();
 	state[lcode] = 3;
+}
+
+// cause a light to blink if it was off, or if on/blinking, turn it off
+int light_blink_toggle(unsigned int num, unsigned int milliseconds)
+{
+	if (num > 199) return 0;
+	int lcode = lightcodes[num];
+	if (lcode < 0) return 0;
+	if (state[lcode] == 0) {
+		// led was off, so go into blinking mode
+		if (milliseconds < 50) {
+			milliseconds = 50; // fastest = 10 blinks/sec
+		} else if (milliseconds > 10000) {
+			milliseconds = 10000; // slowest = once every 20 seconds
+		}
+		Serial1.print(lcode);
+		Serial1.print('S');
+		blink_msec[lcode] = milliseconds;
+		blink_prev[lcode] = millis();
+		state[lcode] = 3;
+		return 1;
+	} else {
+		// led was on or blinking, so turn it off
+		Serial1.print(lcode);
+		Serial1.print('s');
+		state[lcode] = 0;
+		return 0;
+	}
 }
 
 // returns true if the light is on or blinking (even if momentarily off)
