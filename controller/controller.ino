@@ -55,7 +55,10 @@ void setup() {
   // turn on the audio shield
   AudioMemory(20);
   sgtl5000_1.enable();
-  sgtl5000_1.volume(0.3);
+  sgtl5000_1.volume(0.6); // usable range is 0.3 (quiet room) to 0.8 (noisy outdoor event)
+  mixer1.gain(0, 0.25);  // sound effects at 25% volume
+  mixer1.gain(1, 0.9);   // voices at 90% volume
+  mixer1.gain(2, 0.1);   // background sounds at 10% volume
 
   // start up the SD card
   SPI.setMOSI(7);
@@ -77,7 +80,19 @@ void setup() {
   }
 }
 
-elapsedMillis ms;
+// To make things happen automatically, usually you need to create an
+// elapsedMillis timer variable, and an integer state variable.  The
+// timer increments 1000 times per second, and you can write it to
+// zero or any other number whenever you wish.  Usually you'll check if
+// the timer is larger than a threshold, and do some action based on
+// your state variable.  By changing the state carefully, you can cause
+// almost any sequence of actions to occur.
+
+int inactive_state=0;
+elapsedMillis inactive_timer;
+
+int redalert_state=0;
+elapsedMillis redalert_timer;
 
 void loop() {
 	lights_update();
@@ -88,7 +103,8 @@ void loop() {
 	if (button_press(4)) {
 		light_toggle(4);
 		Serial.println("Button 4");
-		playEffect.play("BEEP01.WAV");
+		playVoice.play("BANG.WAV");
+		//playEffect.play("BEEP01.WAV");
 		vibe_on(1023, 750); // speed=1023 (fastest), time=3/4 sec
 	}
 	if (button_press(5)) {
@@ -263,10 +279,14 @@ void loop() {
 		playEffect.play("BEEP53.WAV");
 	}
 	if (button_press(55)) {
+		// enter red alert mode!!!
+		redalert_state = 1;
+		redalert_timer = 0; // must reset the timer when starting red alert mode
+		Serial.println("Go to RED ALERT");
 		led_color(5, RED);
 		led_color(6, RED);
 		led_color(7, RED);
-		playEffect.play("BEEP54.WAV");
+		playVoice.play("REDALERT.WAV");
 		light_blink(199, 250);
 	}
 	if (button_press(57)) {
@@ -363,6 +383,9 @@ void loop() {
 		playEffect.play("BEEP11.WAV");
 	}
 	if (button_press(81)) {
+		// stand down from red alert
+		redalert_state = 0;
+		Serial.println("Stand down from red alert");
 		led_color(5, OFF);
 		led_color(6, OFF);
 		led_color(7, OFF);
@@ -620,7 +643,7 @@ void loop() {
 		playEffect.play("BEEP32.WAV");
 	}
 	if (button_press(151)) {
-		playEffect.play("BEEP34.WAV");
+		playVoice.play("RACHEL21.WAV");
 	}
 	if (button_press(152)) {
 		light_toggle(152);
@@ -635,7 +658,7 @@ void loop() {
 	}
 	if (button_press(155)) {
 		light_toggle(155);
-		playEffect.play("BEEP41.WAV");
+		playVoice.play("RACHEL28.WAV");
 	}
 	if (button_press(156)) {
 		light_toggle(156);
@@ -643,7 +666,7 @@ void loop() {
 	}
 	if (button_press(157)) {
 		light_toggle(157);
-		playEffect.play("BEEP50.WAV");
+		playEffect.play("BEEP41.WAV");
 	}
 	if (button_press(158)) {
 		playEffect.play("BEEP51.WAV");
@@ -668,19 +691,98 @@ void loop() {
 		playEffect.play("BEEP58.WAV");
 	}
 
-
-
-
-
-
-
-
-
-
-
-	if (ms > 300) {
-		ms -= 300;
+	// check all the buttons again, and set the inactive timer
+	// back to zero if any button was pressed
+	for (int i=4; i <= 163; i++) {
+		if (button_press(i)) {
+			inactive_timer = 0;
+			break;
+		}
 	}
+	// play a message when nobody using the buttons
+	if (inactive_timer > 480000) { // 480000 ms = 8 minutes
+		if (inactive_state < 5) {
+			// five messages will be "come over here and push this button"
+			playVoice.play("RACHEL30.WAV");
+			inactive_state = inactive_state + 1;
+		} else if (inactive_state == 5) {
+			// then play "do you want a massage"
+			playVoice.play("RACHEL31.WAV");
+			inactive_state = 0;
+		}
+		// Reset the timer, but reset it to already 3 minutes, so
+		// the 8 second threshold will be reached in only 5 minutes.
+		// But button presses will reset to zero, for full 8 min
+		inactive_timer = 180000;
+	}
+
+
+	// if we're in red alert mode, play the alarm sound and flash the LEDs
+	if (redalert_state > 0) {
+		if (redalert_state == 1) {
+			// in state 1, wait 2 seconds, then play the sound, LEDs off
+			if (redalert_timer > 2000) {
+				// wait until the no other voice is playing
+				if (!playVoice.isPlaying()) {
+					playVoice.play("REDALERT.WAV");
+					led_color(5, OFF);
+					led_color(6, OFF);
+					led_color(7, OFF);
+					Serial.println("red alert: go to state 2");
+					redalert_state = 2; // transition to state 2
+					redalert_timer = 0; // with the timer reset
+				}
+			}
+		} else if (redalert_state == 2) {
+			// in state 2, wait 1/3 second, then turn LEDs red again
+			if (redalert_timer > 333) {
+				led_color(5, RED);
+				led_color(6, RED);
+				led_color(7, RED);
+				Serial.println("red alert: go to state 3");
+				redalert_state = 3; // transition to state 3
+				redalert_timer = 0; // with the timer reset
+			}
+		} else if (redalert_state == 3) {
+			// in state 3, wait 2 seconds, then play the sound, LEDs off
+			if (redalert_timer > 2000) {
+				// wait until the no other voice is playing
+				if (!playVoice.isPlaying()) {
+					playVoice.play("REDALERT.WAV");
+					led_color(5, OFF);
+					led_color(6, OFF);
+					led_color(7, OFF);
+					Serial.println("red alert: go to state 4");
+					redalert_state = 4; // transition to state 4
+					redalert_timer = 0; // with the timer reset
+				}
+			}
+		} else if (redalert_state == 4) {
+			// in state 4, wait 1/3 second, then turn LEDs red again
+			if (redalert_timer > 333) {
+				led_color(5, RED);
+				led_color(6, RED);
+				led_color(7, RED);
+				Serial.println("red alert: go to state 5");
+				redalert_state = 5; // transition to state 5
+				redalert_timer = 0; // with the timer reset
+			}
+		} else {
+			// in state 5, wait 7 seconds, without sound
+			if (redalert_timer > 7000) {
+				Serial.println("red alert: go to state 1");
+				redalert_state = 1; // restart at state 1
+				redalert_timer = 0; // with the timer reset
+			}
+		}
+	}
+
+	// also use the inactive timer to turn automatically turn off red alert
+	if (inactive_timer > 120000) { // 2 min
+		redalert_state = 0;
+	}
+
+
 }
 
 /*
