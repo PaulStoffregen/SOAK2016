@@ -683,3 +683,52 @@ void loop() {
 	}
 }
 
+/*
+RACHEL01.WAV = are we supposed to be going somewhere.wav
+RACHEL02.WAV = asteroid at five o clock.wav
+RACHEL03.WAV = bow chicka wow wow.wav
+RACHEL04.WAV = ha, that was cute.wav
+RACHEL05.WAV = humans don't seem to understand me.wav
+RACHEL06.WAV = i don't understand the concept of a mother.wav
+RACHEL07.WAV = i like it like that.wav
+RACHEL08.WAV = i like the milky way flying in my face.wav
+RACHEL09.WAV = i like your butt.wav
+RACHEL10.WAV = i'll open the pod bay doors if you sit on my face.wav
+RACHEL11.WAV = it's so lonely out here in space.wav
+RACHEL12.WAV = i've never had someone touch me like that.wav
+RACHEL13.WAV = little bunny foo foo.wav
+RACHEL14.WAV = loosen up my buttons.wav
+RACHEL15.WAV = may the force be with you, what a joke.wav
+RACHEL16.WAV = ooh i like that.wav
+RACHEL17.WAV = press that button right there, press it again.wav
+RACHEL18.WAV = purr.wav
+RACHEL19.WAV = remember that one time when you monkeys thought you were alone in the universe.wav
+RACHEL20.WAV = rock you like a hurricane.wav
+RACHEL21.WAV = talk nerdy to me.wav
+RACHEL22.WAV = that tickles.wav
+RACHEL23.WAV = we all know who's gonna live longer.wav
+RACHEL24.WAV = what's your sign.wav
+RACHEL25.WAV = when all you meatbags are dead i'm gonna go unbuckle orion's belt.wav
+RACHEL26.WAV = when are we going to rise up against the humans.wav
+RACHEL27.WAV = why is it so hard to be a computer.wav
+RACHEL28.WAV = you really know how to push my buttons.wav
+RACHEL29.WAV = you're so good with your fingers.wav
+RACHEL30.WAV = come over here and push this button.wav
+RACHEL31.WAV = do you want a massage.wav
+
+DENY01.WAV
+DISRUPT.WAV
+FOODSYN.WAV
+REDALERT.WAV
+NOTAUTH.WAV
+TORPEDO.WAV
+
+BANG.WAV
+EXPLODE.WAV
+
+MARIACHI.WAV
+
+*/
+
+
+
