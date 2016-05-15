@@ -59,13 +59,11 @@ int light_toggle(unsigned int num)
 	int lcode = lightcodes[num];
 	if (lcode < 0) return 0;
 	if (state[lcode] == 0) {
-		Serial.println("toggle on");
 		state[lcode] = 1;
 		Serial1.print(lcode);
 		Serial1.print('S');
 		return 1;
 	} else {
-		Serial.println("toggle off");
 		state[lcode] = 0;
 		Serial1.print(lcode);
 		Serial1.print('s');

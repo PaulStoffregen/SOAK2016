@@ -72,12 +72,16 @@ void setup() {
 	light_off(i);
 	delay(1);
   }
+  for (int i=1; i <= 9; i++) {
+	led_color(i, OFF);
+  }
 }
 
 elapsedMillis ms;
 
 void loop() {
 	lights_update();
+	leds_update();
 	buttons_update();
 
 	if (button_press(4)) {
@@ -108,13 +112,16 @@ void loop() {
 	if (button_press(9)) {
 		if (light_is_blinking(9)) {
 			// when blinking, press turns light off, no sound
+			led_color(9, OFF);
 			light_off(9);
 		} else if (light_is_on(9)) {
 			// when on solid, press make it blink, plays beep
+			led_color(9, 0x303030);
 			playEffect.play("BEEP03.WAV");
 			light_blink(9, 200);
 		} else {
 			// when off, press turns it on solid, plays beep
+			led_color(9, WHITE);
 			playEffect.play("BEEP07.WAV");
 			light_on(9);
 		}
@@ -132,18 +139,24 @@ void loop() {
 		}
 	}
 	if (button_press(12)) {
+		led_color(2, YELLOW);
+		led_color(3, GREEN);
 		light_toggle(12);
 		if (light_is_on(12)) {
 			playEffect.play("BEEP10.WAV");
 		}
 	}
 	if (button_press(13)) {
+		led_color(1, BLUE);
+		led_color(2, BLUE);
 		light_toggle(13);
 		if (light_is_on(13)) {
 			playEffect.play("BEEP11.WAV");
 		}
 	}
 	if (button_press(14)) {
+		led_color(1, PINK);
+		led_color(2, RED);
 		if (light_is_blinking(14)) {
 			light_off(14);
 		} else {
@@ -246,6 +259,9 @@ void loop() {
 		playEffect.play("BEEP53.WAV");
 	}
 	if (button_press(55)) {
+		led_color(5, RED);
+		led_color(6, RED);
+		led_color(7, RED);
 		playEffect.play("BEEP54.WAV");
 		light_blink(199, 250);
 	}
@@ -333,6 +349,9 @@ void loop() {
 		playEffect.play("BEEP11.WAV");
 	}
 	if (button_press(81)) {
+		led_color(5, OFF);
+		led_color(6, OFF);
+		led_color(7, OFF);
 		light_off(199);
 		playEffect.play("BEEP12.WAV");
 	}
