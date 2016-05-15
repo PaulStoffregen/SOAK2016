@@ -13,6 +13,7 @@ void buttons_update();
 int button_press(unsigned int num);
 int button_release(unsigned int num);
 int button_down(unsigned int num);
+int knob(unsigned int num);
 
 void leds_update();
 void led_color(unsigned int num, unsigned int rgb);

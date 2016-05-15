@@ -4,6 +4,7 @@
 static int32_t state[8];
 static int32_t press[8];
 static int32_t release[8];
+static char knobval[20];
 
 // Returns true if this button was pressed during the most recent update
 int button_press(unsigned int num)
@@ -58,9 +59,15 @@ void buttons_update()
 				state[incoming >> 5] &= ~(1 << (incoming & 31));
 			}
 		} else if (c == 'A' || c == 'a') {
-			// analog reading (pot)
-			//Serial.print(incoming);
-			//Serial.println(c);
+			// analog reading (knob)
+			int num = incoming / 100;
+			if (num < 20) {
+				knobval[num] = incoming % 100;
+				//Serial.print("knob ");
+				//Serial.print(num);
+				//Serial.print(" is ");
+				//Serial.println((int)knobval[num]);
+			}
 		} else {
 			// unknown message type
 		} 
@@ -68,3 +75,10 @@ void buttons_update()
 	}
 }
 
+// return the position of one of the knobs
+// position is from 0 to 99
+int knob(unsigned int num)
+{
+	if (num >= 20) return 0;
+	return knobval[num];
+}
