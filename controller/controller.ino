@@ -82,12 +82,14 @@ elapsedMillis ms;
 void loop() {
 	lights_update();
 	leds_update();
+	vibe_update();
 	buttons_update();
 
 	if (button_press(4)) {
 		light_toggle(4);
 		Serial.println("Button 4");
 		playEffect.play("BEEP01.WAV");
+		vibe_on(1023, 750); // speed=1023 (fastest), time=3/4 sec
 	}
 	if (button_press(5)) {
 		light_toggle(5);
@@ -130,12 +132,14 @@ void loop() {
 		light_toggle(10);
 		if (light_is_on(10)) {
 			playEffect.play("BEEP08.WAV");
+			vibe_on(150, 3000); // speed=150, time=3 sec
 		}
 	}
 	if (button_press(11)) {
 		light_toggle(11);
 		if (light_is_on(11)) {
 			playEffect.play("BEEP09.WAV");
+			vibe_on(600, 1000); // speed=600, time=1 sec
 		}
 	}
 	if (button_press(12)) {
@@ -290,6 +294,16 @@ void loop() {
 		playEffect.play("BEEP68.WAV");
 	}
 	if (button_press(64)) {
+		vibe_off();
+		led_color(1, OFF);
+		led_color(2, OFF);
+		led_color(3, OFF);
+		led_color(4, OFF); // turn off all the LEDs
+		led_color(5, OFF);
+		led_color(6, OFF);
+		led_color(7, OFF);
+		led_color(8, OFF);
+		led_color(9, OFF);
 		playEffect.play("BEEP69.WAV");
 	}
 	if (button_press(65)) {

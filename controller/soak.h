@@ -26,5 +26,8 @@ void led_color(unsigned int num, unsigned char red, unsigned char green, unsigne
 #define ORANGE 0xE05800
 #define WHITE  0xFFFFFF
 
+void vibe_update();
+void vibe_on(unsigned int amount, unsigned int milliseconds);
+void vibe_off();
 
 
