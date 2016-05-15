@@ -780,6 +780,10 @@ void loop() {
 	// also use the inactive timer to turn automatically turn off red alert
 	if (inactive_timer > 120000) { // 2 min
 		redalert_state = 0;
+		led_color(5, OFF);
+		led_color(6, OFF);
+		led_color(7, OFF);
+		light_off(199);
 	}
 
 
