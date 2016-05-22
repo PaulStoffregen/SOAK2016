@@ -265,15 +265,17 @@ void loop() {
 	if (button_press(10)) {
 		light_toggle(10);
 		if (light_is_on(10)) {
-			playEffect.play("BEEP08.WAV");
-			vibe_on(150, 3000); // speed=150, time=3 sec
+			playEffect.play("RACHEL31.WAV");
+			delay(2000);
+			vibe_on(300, 3000); // speed=300, time=3 sec
 		}
 	}
 	if (button_press(11)) {
 		light_toggle(11);
 		if (light_is_on(11)) {
-			playEffect.play("BEEP09.WAV");
-			vibe_on(600, 1000); // speed=600, time=1 sec
+			playEffect.play("MARIACHI.WAV");
+			delay(16000);
+			vibe_on(400, 1000); // speed=400, time=1 sec
 		}
 	}
 	if (button_press(12)) {
@@ -826,6 +828,8 @@ void loop() {
 		} else if (inactive_state == 5) {
 			// then play "do you want a massage"
 			playVoice.play("RACHEL31.WAV");
+			delay(2000);
+			vibe_on(300, 3000);
 			inactive_state = 0;
 		}
 		// Reset the timer, but reset it to already 3 minutes, so
