@@ -120,7 +120,7 @@ const char * rachel[] = {
 	"RACHEL29.WAV", // you're so good with your fingers.wav
 	"RACHEL14.WAV", // loosen up my buttons.wav
 	"RACHEL27.WAV", // why is it so hard to be a computer.wav
-	"RACHEL25.WAV", // when all you meatbags are dead i'm gonna go unbuckle orion's belt.wav
+	// "RACHEL25.WAV", // when all you meatbags are dead i'm gonna go unbuckle orion's belt.wav
 	"RACHEL07.WAV", // i like it like that.wav
 	"RACHEL11.WAV", // it's so lonely out here in space.wav
 	"RACHEL13.WAV", // little bunny foo foo.wav
@@ -406,7 +406,8 @@ void loop() {
 		led_color(5, RED);
 		led_color(6, RED);
 		led_color(7, RED);
-		playVoice.play("REDALERT.WAV");
+		playVoice.play("RACHEL32.WAV");
+		playEffect.play("REDALERT.WAV");
 		light_blink(199, 250);
 	}
 	if (button_press(57)) {
@@ -503,14 +504,8 @@ void loop() {
 		playBeepAndRachelSound();
 	}
 	if (button_press(81)) {
-		// stand down from red alert
-		redalert_state = 0;
-		Serial.println("Stand down from red alert");
-		led_color(5, OFF);
-		led_color(6, OFF);
-		led_color(7, OFF);
-		light_off(199);
-		playEffect.play("BEEP12.WAV");
+		light_toggle(81);
+		playBeepAndRachelSound();
 	}
 	if (button_press(82)) {
 		light_toggle(82);
@@ -844,9 +839,9 @@ void loop() {
 		if (redalert_state == 1) {
 			// in state 1, wait 2 seconds, then play the sound, LEDs off
 			if (redalert_timer > 2000) {
-				// wait until the no other voice is playing
-				if (!playVoice.isPlaying()) {
-					playVoice.play("REDALERT.WAV");
+				// wait until the no other effect is playing
+				if (!playEffect.isPlaying()) {
+					playEffect.play("REDALERT.WAV");
 					led_color(5, OFF);
 					led_color(6, OFF);
 					led_color(7, OFF);
@@ -869,8 +864,8 @@ void loop() {
 			// in state 3, wait 2 seconds, then play the sound, LEDs off
 			if (redalert_timer > 2000) {
 				// wait until the no other voice is playing
-				if (!playVoice.isPlaying()) {
-					playVoice.play("REDALERT.WAV");
+				if (!playEffect.isPlaying()) {
+					playEffect.play("REDALERT.WAV");
 					led_color(5, OFF);
 					led_color(6, OFF);
 					led_color(7, OFF);
@@ -890,22 +885,21 @@ void loop() {
 				redalert_timer = 0; // with the timer reset
 			}
 		} else {
-			// in state 5, wait 7 seconds, without sound
-			if (redalert_timer > 7000) {
-				Serial.println("red alert: go to state 1");
-				redalert_state = 1; // restart at state 1
-				redalert_timer = 0; // with the timer reset
+			// wait 6 seconds so the voice clip can finish playing
+			if (redalert_timer > 6000) {
+				// play explosion and vibration
+				playVoice.play("BANG.WAV");
+				vibe_on(1023, 750); // speed=1023 (fastest), time=3/4 sec
+
+				// exit red alert
+				Serial.println("exiting red alert");
+				redalert_state = 0;
+				led_color(5, OFF);
+				led_color(6, OFF);
+				led_color(7, OFF);
+				light_off(199);
 			}
 		}
-	}
-
-	// also use the inactive timer to turn automatically turn off red alert
-	if (inactive_timer > 120000) { // 2 min
-		redalert_state = 0;
-		led_color(5, OFF);
-		led_color(6, OFF);
-		led_color(7, OFF);
-		light_off(199);
 	}
 
 
@@ -943,6 +937,7 @@ RACHEL28.WAV = you really know how to push my buttons.wav
 RACHEL29.WAV = you're so good with your fingers.wav
 RACHEL30.WAV = come over here and push this button.wav
 RACHEL31.WAV = do you want a massage.wav
+RACHEL32.WAV = self destruct.wav
 
 DENY01.WAV
 DISRUPT.WAV
