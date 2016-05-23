@@ -163,6 +163,16 @@ void playBeepAndRachelSound() {
 	playRachelSound();
 }
 
+void turnOffAllLights() {
+	for (int i=0; i < 200; i++) {
+		light_off(i);
+		delay(1);
+	}
+	for (int i=1; i <= 9; i++) {
+		led_color(i, OFF);
+	}
+}
+
 void setup() {
   // turn on serial ports, for controlling everything
   Serial1.begin(117647);
@@ -189,13 +199,7 @@ void setup() {
     }
   }
   // start with all the lights off
-  for (int i=0; i < 200; i++) {
-	light_off(i);
-	delay(1);
-  }
-  for (int i=1; i <= 9; i++) {
-	led_color(i, OFF);
-  }
+  turnOffAllLights();
 }
 
 // To make things happen automatically, usually you need to create an
@@ -400,6 +404,7 @@ void loop() {
 	}
 	if (button_press(55)) {
 		// enter red alert mode!!!
+		turnOffAllLights();
 		redalert_state = 1;
 		redalert_timer = 0; // must reset the timer when starting red alert mode
 		Serial.println("Go to RED ALERT");
@@ -436,15 +441,7 @@ void loop() {
 	}
 	if (button_press(64)) {
 		vibe_off();
-		led_color(1, OFF);
-		led_color(2, OFF);
-		led_color(3, OFF);
-		led_color(4, OFF); // turn off all the LEDs
-		led_color(5, OFF);
-		led_color(6, OFF);
-		led_color(7, OFF);
-		led_color(8, OFF);
-		led_color(9, OFF);
+		turnOffAllLights();
 		playEffect.play("BEEP69.WAV");
 	}
 	if (button_press(65)) {
@@ -885,19 +882,16 @@ void loop() {
 				redalert_timer = 0; // with the timer reset
 			}
 		} else {
-			// wait 6 seconds so the voice clip can finish playing
-			if (redalert_timer > 6000) {
-				// play explosion and vibration
+			// wait 5.5 seconds so the voice clip can finish playing
+			if (redalert_timer > 5500) {
+				// turn off all lights and play explosion and vibration
+				turnOffAllLights();
 				playVoice.play("BANG.WAV");
 				vibe_on(1023, 750); // speed=1023 (fastest), time=3/4 sec
 
 				// exit red alert
 				Serial.println("exiting red alert");
 				redalert_state = 0;
-				led_color(5, OFF);
-				led_color(6, OFF);
-				led_color(7, OFF);
-				light_off(199);
 			}
 		}
 	}
