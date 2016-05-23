@@ -224,30 +224,26 @@ void loop() {
 
 	if (button_press(4)) {
 		light_toggle(4);
-		Serial.println("Button 4");
-		playVoice.play("BANG.WAV");
-		//playEffect.play("BEEP01.WAV");
-		vibe_on(1023, 750); // speed=1023 (fastest), time=3/4 sec
+		playBeepAndRachelSound();
 	}
 	if (button_press(5)) {
 		light_toggle(5);
-		Serial.println("Button 5");
-		playEffect.play("BEEP02.WAV");
+		playBeepAndRachelSound();
 	}
 	if (button_press(6)) {
 		// 6 and 7 affect each other's lights...
 		light_toggle(6);
 		light_toggle(7);
-		playEffect.play("BEEP03.WAV");
+		playBeepAndRachelSound();
 	}
 	if (button_press(7)) {
 		// 6 and 7 affect each other's lights...
 		light_toggle(6);
 		light_toggle(7);
-		playEffect.play("BEEP04.WAV");
+		playBeepAndRachelSound();
 	}
 	if (button_press(8)) {
-		playEffect.play("BEEP05.WAV");
+		playBeepAndRachelSound();
 	}
 	if (button_press(9)) {
 		if (light_is_blinking(9)) {
